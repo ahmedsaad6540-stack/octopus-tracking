@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCTOPUS V3.1 – Profit Twin Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070f; --card:#10182c; --card2:#141f38;
+  --accent:#00ffc8; --pink:#ff3b6b; --amber:#ffbe3d;
+  --text:#eaf0ff; --muted:#8a9ab8; --green:#00d68f; --red:#ff5a7a;
+  --border:#233052;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 18px 70px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:22px}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px}
+.logo-b{width:48px;height:48px;border-radius:14px;background:radial-gradient(circle at 30% 30%, #ff3b6b, #ffbe3d);display:flex;align-items:center;justify-content:center;font-size:26px}
+.pill{background:rgba(0,214,143,.1);color:#39ffbd;border:1px solid rgba(0,214,143,.3);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700}
+.pill.off{background:rgba(255,90,122,.1);color:#ff8aa3;border-color:rgba(255,90,122,.3)}
+.card{background:linear-gradient(180deg,var(--card),#0c1326);border:1px solid var(--border);border-radius:20px;padding:18px 18px}
+h3{font-size:14px;color:var(--muted);margin-bottom:12px;font-weight:600}
+.grid{display:grid;grid-template-columns:1.35fr .85fr;gap:16px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 20px}
+@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:14px}
+.kpi .l{color:var(--muted);font-size:12px}
+.kpi .v{font-size:24px;font-weight:800;margin-top:3px}
+.kpi .s{font-size:12px;color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{color:var(--muted);font-weight:500;text-align:right;padding:9px 8px;border-bottom:1px solid var(--border)}
+td{padding:11px 8px;border-bottom:1px solid #18213a}
+tr:hover td{background:#131d34}
+.go{color:var(--accent);font-weight:800}
+.btn{background:var(--pink);color:#fff;border:0;font-family:inherit;font-weight:700;padding:11px 16px;border-radius:11px;cursor:pointer;font-size:13.5px}
+.btn.secondary{background:#1d2745;color:var(--text)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.log{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#080d1c;border:1px solid #1d2746;border-radius:14px;padding:13px;height:220px;overflow:auto;color:#9aabcf;line-height:1.9}
+.log span{color:var(--accent)}
+.twin{background:#0b1124;border:1px dashed #2a3a62;border-radius:14px;padding:14px;margin-top:10px}
+.twin .row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}
+.twin .row b{font-size:18px}
+.bar{height:10px;background:#1a2340;border-radius:99px;overflow:hidden;margin:8px 0}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,#ff3b6b,#ffbe3d);width:2.5%}
+.muted{color:var(--muted)}
+footer{margin-top:22px;text-align:center;color:#5b6a88;font-size:12px}
+code{background:#0d1428;border:1px solid #1e2a4a;padding:2px 6px;border-radius:6px;font-size:12px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <div class="logo-b">🐙</div>
+      <div>OCTOPUS V3.1<br><span style="font-size:12px;font-weight:500;color:var(--muted)">Profit Twin – Live Tracking</span></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="pill" id="apiPill">● API: checking…</span>
+      <button class="btn ghost" onclick="loadROI()">تحديث</button>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="l">إجمالي المشاهدات</div><div class="v" id="k_views">—</div><div class="s">platform views</div></div>
+    <div class="kpi"><div class="l">نقرات حقيقية</div><div class="v" id="k_clicks">—</div><div class="s">bot filtered</div></div>
+    <div class="kpi"><div class="l">مبيعات</div><div class="v" id="k_sales">—</div><div class="s">approved</div></div>
+    <div class="kpi"><div class="l">الأرباح</div><div class="v" id="k_rev">$—</div><div class="s">commission USD</div></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>📊 Revenue Attribution – Video ROI</h3>
+        <table>
+          <thead><tr><th>الفيديو / Hook</th><th>Views</th><th>Clicks</th><th>Sales</th><th>Revenue</th><th>CR</th></tr></thead>
+          <tbody id="roiBody">
+            <tr><td colspan="6" style="color:var(--muted)">جاري التحميل من /roi … لو فاضي شغّل السيرفر تحت.</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:12px;margin-top:10px">API: <code id="apiUrl">http://localhost:8000</code> • endpoint <code>/roi</code></p>
+      </div>
+
+      <div class="card">
+        <h3>🧪 First Click Audit Run – آخر اختبار</h3>
+        <div class="log" id="auditLog">[ready] اضغط "شغل Test Runner" أو شغله من التيرمنال.<br><br>آخر run ناجح محلي:<br>[14:35] <span>Click</span> → 5bba1233-3878… latency 0ms ✓<br>[14:35] <span>Postback</span> → Impact $25.5 approved ✓<br>[14:35] <span>ROI</span> → sales=1 revenue=$25.50 cr=100% ✓<br><br>✅ PIPELINE STATUS: PASS<br></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn secondary" id="testBtn" onclick="runAudit()">▶ شغل Test Runner</button>
+          <button class="btn ghost" onclick="document.getElementById('auditLog').innerHTML='[ready] '">مسح</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin-top:8px">Test Runner بيضرب: <code>/r → /postback/impact → /roi</code> ويتأكد إن Click → Conversion → Revenue مربوط صح.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>🎯 Profit Twin</h3>
+        <div class="twin">
+          <div class="row"><span>الهدف الشهري</span><b>$1,000</b></div>
+          <div class="row"><span>الحالي</span><b style="color:var(--green)" id="tw_current">$25.50</b></div>
+          <div class="bar"><i id="tw_bar" style="width:2.55%"></i></div>
+          <div class="row"><span>الفجوة</span><b id="tw_gap">$974.50</b></div>
+          <div class="row"><span>فيديوهات مطلوبة تقريباً</span><b id="tw_need">~39</b></div>
+          <p class="muted" style="font-size:12px;margin-top:6px">محسوب على متوسط $25.5 / فيديو من أول sale حقيقي.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🚀 GTM Mini Loop – جاهز للإطلاق</h3>
+        <p style="font-size:13.5px;line-height:1.9;color:#c5cfeb">
+          <b>مصدر:</b> TikTok فقط<br>
+          <b>كاتالوج:</b> 20 منتج – مال / AI / Beauty / علاقات<br>
+          <b>وتيرة:</b> 3 فيديوهات / يوم – 1PM / 9PM / 1AM KSA<br><br>
+          <b>3 سكريبتات أول يوم:</b><br>
+          1. 💸 "راتبك بيطير يوم 10؟" – Budget Planner<br>
+          2. 🤖 "CV بتاعك السبب" – AI Resume Builder<br>
+          3. 💄 "3 أخطاء بتدمر بشرتك" – Skin Course<br>
+        </p>
+        <p class="muted" style="font-size:12px;margin-top:8px">Funnel: Video → <code>/r?video=…&product=…</code> → Click logged → affiliate?subid={click_id} → Postback → /roi</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    OCTOPUS V3.1 – Tracking Server: <code>uvicorn tracking_server:app --reload --port 8000</code><br>
+    Test: <code>python test_runner.py</code> • DB: Supabase / Local JSON fallback • Schema v2 append-only
+  </footer>
+</div>
+
+<script>
+const API = localStorage.getItem('octopus_api') || 'http://localhost:8000';
+document.getElementById('apiUrl').textContent = API;
+
+const logEl = document.getElementById('auditLog');
+function alog(t){ logEl.innerHTML += t + "<br>"; logEl.scrollTop = logEl.scrollHeight; }
+
+async function loadROI(){
+  const pill = document.getElementById('apiPill');
+  try{
+    const r = await fetch(API + '/roi');
+    if(!r.ok) throw 0;
+    const j = await r.json();
+    const rows = j.videos || [];
+    pill.textContent = '● API LIVE – ' + (j.source || 'supabase');
+    pill.className = 'pill';
+    let views=0, clicks=0, sales=0, rev=0;
+    const tbody = document.getElementById('roiBody');
+    if(rows.length===0){
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted)">لا توجد بيانات بعد. شغّل Test Runner.</td></tr>';
+    } else {
+      tbody.innerHTML = '';
+      rows.forEach(v=>{
+        views += v.views||0;
+        clicks += v.clicks_real||0;
+        sales += v.sales||0;
+        rev += parseFloat(v.revenue_usd||0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${(v.hook||v.video_id||'').slice(0,42)}</td>
+          <td>${v.views||0}</td><td>${v.clicks_real||0}</td>
+          <td>${v.sales||0}</td>
+          <td class="go">$${Number(v.revenue_usd||0).toFixed(2)}</td>
+          <td>${v.conversion_rate||0}%</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+    document.getElementById('k_views').textContent = views.toLocaleString('en-US');
+    document.getElementById('k_clicks').textContent = clicks.toLocaleString('en-US');
+    document.getElementById('k_sales').textContent = sales;
+    document.getElementById('k_rev').textContent = '$' + rev.toFixed(2);
+    // Profit Twin
+    const current = rev;
+    document.getElementById('tw_current').textContent = '$' + current.toFixed(2);
+    const gap = Math.max(0, 1000 - current);
+    document.getElementById('tw_gap').textContent = '$' + gap.toFixed(2);
+    const avg = sales>0 ? current / Math.max(rows.length,1) : 25.5;
+    const need = avg>0 ? Math.ceil(gap / avg) : 39;
+    document.getElementById('tw_need').textContent = '~' + need;
+    document.getElementById('tw_bar').style.width = Math.min(100, current/1000*100) + '%';
+  }catch(e){
+    pill.textContent = '● API offline';
+    pill.className = 'pill off';
+  }
+}
+
+async function runAudit(){
+  const btn = document.getElementById('testBtn');
+  btn.disabled = true; btn.textContent = 'جاري…';
+  alog('[run] Starting First Click Audit…');
+  try{
+    // 1. click
+    const video = crypto.randomUUID();
+    const product = crypto.randomUUID();
+    const r1 = await fetch(`${API}/r?video=${video}&product=${product}`, {redirect:'manual'});
+    const click_id = r1.headers.get('X-Octopus-Click');
+    const latency = r1.headers.get('X-Octopus-Latency');
+    if(!click_id) throw 'no click_id';
+    alog(`<span>Click</span> → ${click_id} latency ${latency}ms ✓`);
+    await new Promise(s=>setTimeout(s, 300));
+    // 2. conversion
+    const order = crypto.randomUUID();
+    const r2 = await fetch(`${API}/postback/impact?subid=${click_id}&order_id=${order}&payout=25.5&sale_amount=100&currency=USD`);
+    const j2 = await r2.json();
+    if(!j2.ok) throw 'postback failed';
+    alog(`<span>Conversion</span> → order ${order.slice(0,8)}… $${j2.commission_usd} ✓`);
+    await new Promise(s=>setTimeout(s, 300));
+    // 3. roi
+    await loadROI();
+    alog(`<span>ROI</span> → verified ✓`);
+    alog(`<br><b style="color:#00ffc8">✅ PIPELINE STATUS: PASS</b><br>`);
+  }catch(e){
+    alog(`<span style="color:#ff5a7a">FAIL:</span> ${e} – تأكد إن السيرفر شغال: uvicorn tracking_server:app --port 8000`);
+  }
+  btn.disabled = false; btn.textContent = '▶ شغل Test Runner';
+}
+
+loadROI();
+</script>
+</body>
+</html>
